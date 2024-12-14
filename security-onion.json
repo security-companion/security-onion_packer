@@ -1,0 +1,52 @@
+{
+  "builders": [
+    {
+      "type": "virtualbox-iso",
+      "vm_name": "security-onion",
+      "iso_url": "{{user `iso_url`}}",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "headless": false,
+      "boot_wait": "1m",
+      "boot_command": [
+        "<enter><enter>yes<enter>vagrant<enter>vagrant<enter>vagrant<enter><wait30m><enter>"
+      ],
+      "winrm_timeout": "4h",
+      "communicator": "ssh",
+      "shutdown_timeout": "2h",
+      "guest_os_type": "Oracle_64",
+      "guest_additions_mode": "disable",
+      "disk_size": "{{user `disk_size`}}",
+      "ssh_username": "vagrant",
+      "ssh_password": "vagrant", 
+      "shutdown_command": "echo 'packer' | sudo -S /sbin/shutdown -P now",
+      "vboxmanage": [
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--memory",
+          "8096"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--cpus",
+          "4"
+        ]
+      ]
+    }
+  ],
+  "post-processors": [
+    {
+      "type": "vagrant",
+      "keep_input_artifact": false,
+      "output": "windows_10_{{.Provider}}.box",
+      "vagrantfile_template": "vagrantfile-windows_10.template"
+    }
+  ],
+  "variables": {
+    "iso_checksum": "sha256:B087A0D12FC2CA3CCD02BD52E52421F4F60DC09BF826337A057E05A04D114CCE",
+    "iso_url": "https://download.securityonion.net/file/securityonion/securityonion-2.4.110-20241010.iso",
+    "disk_size": "112640",
+    "packer_build_dir": "./seconion"
+  }
+}
